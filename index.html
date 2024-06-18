@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js?v=1.0"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -93,4 +93,65 @@
         <div class="leftMenu">
             <div class="intro">
                 <div>Verificar imágenes desde:</div><br>
-                <textarea name="skus" id="skus" cols="30"
+                <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, uno debajo de otro sin comas"></textarea>
+                <button id="buscar">VERIFICAR</button>
+                <div class="progress-bar">
+                    <div id="progress">0%</div>
+                </div>
+            </div>
+        </div>
+        <div class="rightContainer">
+            <div class="error-list" id="errorList">
+                <!-- SKUs sin foto aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#buscar').click(function() {
+            $('#errorList').empty();
+            var skus = $('#skus').val().split('\n');
+            var promises = [];
+            skus.forEach(function(sku) {
+                sku = sku.trim();
+                if (sku !== "") {
+                    promises.push(checkImage(sku));
+                }
+            });
+            Promise.all(promises).then(function(results) {
+                results.forEach(function(result) {
+                    if (result.error) {
+                        $('#errorList').append('<div>' + result.sku + ' - No tiene foto</div>');
+                    }
+                });
+                updateProgress(100);
+            });
+        });
+
+        function checkImage(sku) {
+            return new Promise(function(resolve) {
+                var url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
+                var img = new Image();
+                img.src = url;
+                img.alt = sku;
+                img.onload = function() {
+                    fetch(url, { method: 'HEAD' }).then(function(response) {
+                        var contentLength = response.headers.get('content-length');
+                        if (contentLength == '12345') { // Reemplaza '12345' con el tamaño real de la imagen por defecto
+                            resolve({ error: true, sku: sku });
+                        } else {
+                            resolve({ error: false, sku: sku });
+                        }
+                    });
+                };
+                img.onerror = function() {
+                    resolve({ error: true, sku: sku });
+                };
+            });
+        }
+
+        function updateProgress(percent) {
+            $('#progress').css('width', percent + '%').text(percent + '%');
+        }
+    </script>
+</body>
+</html>
