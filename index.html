@@ -114,7 +114,7 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;
+            width: 100px;
             height: 34px;
         }
         .switch input {
@@ -148,7 +148,20 @@
             background-color: #8fca00;
         }
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(66px);
+        }
+        .label-left, .label-right {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #333;
+        }
+        .label-left {
+            left: 10px;
+        }
+        .label-right {
+            right: 10px;
         }
     </style>
 </head>
@@ -161,6 +174,8 @@
                     <label class="switch">
                         <input type="checkbox" id="urlSwitch">
                         <span class="slider"></span>
+                        <span class="label-left">Scene7</span>
+                        <span class="label-right">Cloudflare</span>
                     </label>
                 </div>
                 <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, uno debajo de otro sin comas"></textarea>
@@ -254,12 +269,37 @@
                 if (urlOption === 1) {
                     url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
                 } else {
-                    url = 'https://otrodominio.com/images/' + sku + '?scl=1&qlt=100,1&cache=off';
+                    url = 'https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/' + sku + '/w=1500,h=1500,fit=pad';
                 }
                 console.log("Verificando imagen para SKU: " + sku + " desde URL: " + url);
                 var img = new Image();
                 img.src = url;
                 img.alt = sku;
                 img.onload = function() {
-                    fetch(url, { method: 'HEAD' }).then(function(response) {
-                        var contentLength = response.headers.get('content
+                    if (urlOption === 1) {
+                        fetch(url, { method: 'HEAD' }).then(function(response) {
+                            var contentLength = response.headers.get('content-length');
+                            console.log("Tamaño de contenido para SKU " + sku + ": " + contentLength);
+                            // Suponiendo que el tamaño de la imagen por defecto es 19698 bytes
+                            if (contentLength == '19698') {
+                                resolve({ error: true, sku: sku });
+                            } else {
+                                resolve({ error: false, sku: sku });
+                            }
+                        }).catch(function(error) {
+                            console.error("Error al obtener el tamaño de la imagen para SKU: " + sku, error);
+                            resolve({ error: true, sku: sku });
+                        });
+                    } else {
+                        resolve({ error: false, sku: sku });
+                    }
+                };
+                img.onerror = function() {
+                    console.error("Error al cargar la imagen para SKU: " + sku);
+                    resolve({ error: true, sku: sku });
+                };
+            });
+        }
+    </script>
+</body>
+</html>
