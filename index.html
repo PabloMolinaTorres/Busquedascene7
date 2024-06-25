@@ -41,6 +41,7 @@
             border: 1px solid #eee;
             margin: 20px;
             height: calc(100% - 150px);
+            font-family: monospace;
         }
         .leftMenu button {
             width: calc(100% - 40px);
@@ -169,7 +170,7 @@
                     </label>
                     <span>CF</span>
                 </div>
-                <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, uno debajo de otro sin comas"></textarea>
+                <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, usuario y caso separados por espacios"></textarea>
                 <button id="buscar">VERIFICAR</button>
             </div>
         </div>
@@ -205,18 +206,22 @@
             $('#successList').empty();
             var skus = $('#skus').val().split('\n');
             var promises = [];
-            skus.forEach(function(sku) {
-                sku = sku.trim();
-                if (sku !== "") {
-                    promises.push(checkImage(sku));
+            skus.forEach(function(entry) {
+                entry = entry.trim();
+                if (entry !== "") {
+                    let parts = entry.split(/\s+/);
+                    let sku = parts[0];
+                    let user = parts[1] || "";
+                    let caseNum = parts[2] || "";
+                    promises.push(checkImage(sku, user, caseNum));
                 }
             });
             Promise.all(promises).then(function(results) {
                 results.forEach(function(result) {
                     if (result.error) {
-                        $('#errorList').append('<div>' + result.sku + '</div>');
+                        $('#errorList').append('<div>' + result.entry + '</div>');
                     } else {
-                        $('#successList').append('<div>' + result.sku + '</div>');
+                        $('#successList').append('<div>' + result.entry + '</div>');
                     }
                 });
             });
@@ -254,7 +259,7 @@
             });
         });
 
-        function checkImage(sku) {
+        function checkImage(sku, user, caseNum) {
             return new Promise(function(resolve) {
                 let url;
                 if (urlOption === 1) {
@@ -273,21 +278,21 @@
                             console.log("Tamaño de contenido para SKU " + sku + ": " + contentLength);
                             // Suponiendo que el tamaño de la imagen por defecto es 19698 bytes
                             if (contentLength == '19698') {
-                                resolve({ error: true, sku: sku });
+                                resolve({ error: true, entry: sku + " " + user + " " + caseNum });
                             } else {
-                                resolve({ error: false, sku: sku });
+                                resolve({ error: false, entry: sku + " " + user + " " + caseNum });
                             }
                         }).catch(function(error) {
                             console.error("Error al obtener el tamaño de la imagen para SKU: " + sku, error);
-                            resolve({ error: true, sku: sku });
+                            resolve({ error: true, entry: sku + " " + user + " " + caseNum });
                         });
                     } else {
-                        resolve({ error: false, sku: sku });
+                        resolve({ error: false, entry: sku + " " + user + " " + caseNum });
                     }
                 };
                 img.onerror = function() {
                     console.error("Error al cargar la imagen para SKU: " + sku);
-                    resolve({ error: true, sku: sku });
+                    resolve({ error: true, entry: sku + " " + user + " " + caseNum });
                 };
             });
         }
