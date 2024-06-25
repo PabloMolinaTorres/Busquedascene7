@@ -110,11 +110,15 @@
         .switch-container {
             text-align: center;
             margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         .switch {
             position: relative;
             display: inline-block;
-            width: 100px;
+            width: 60px;
             height: 34px;
         }
         .switch input {
@@ -148,20 +152,7 @@
             background-color: #8fca00;
         }
         input:checked + .slider:before {
-            transform: translateX(66px);
-        }
-        .label-left, .label-right {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            color: #333;
-        }
-        .label-left {
-            left: 10px;
-        }
-        .label-right {
-            right: 10px;
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -171,12 +162,12 @@
             <div class="intro">
                 <div>Verificar imágenes desde:</div><br>
                 <div class="switch-container">
+                    <span>S7</span>
                     <label class="switch">
                         <input type="checkbox" id="urlSwitch">
                         <span class="slider"></span>
-                        <span class="label-left">Scene7</span>
-                        <span class="label-right">Cloudflare</span>
                     </label>
+                    <span>CF</span>
                 </div>
                 <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, uno debajo de otro sin comas"></textarea>
                 <button id="buscar">VERIFICAR</button>
