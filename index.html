@@ -78,17 +78,30 @@
             letter-spacing: .075em;
             cursor: pointer;
         }
-        .error-list {
+        .result-column {
+            width: 45%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .result-column h3 {
+            text-align: center;
+        }
+        .error-list, .success-list {
             padding: 20px;
-            margin: 60px 20px 20px;
+            margin: 20px;
             border: 1px solid #eee;
             background-color: #f9f9f9;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
         }
         .error-list div {
             color: red;
+        }
+        .success-list div {
+            color: green;
         }
     </style>
 </head>
@@ -103,14 +116,24 @@
         </div>
         <div class="rightContainer">
             <button class="copy-button" id="copiar">COPIAR</button>
-            <div class="error-list" id="errorList">
-                <!-- SKUs sin foto aparecerán aquí -->
+            <div class="result-column">
+                <h3>SKUs Sin Foto</h3>
+                <div class="error-list" id="errorList">
+                    <!-- SKUs sin foto aparecerán aquí -->
+                </div>
+            </div>
+            <div class="result-column">
+                <h3>SKUs Con Foto</h3>
+                <div class="success-list" id="successList">
+                    <!-- SKUs con foto aparecerán aquí -->
+                </div>
             </div>
         </div>
     </div>
     <script>
         $('#buscar').click(function() {
             $('#errorList').empty();
+            $('#successList').empty();
             var skus = $('#skus').val().split('\n');
             var promises = [];
             skus.forEach(function(sku) {
@@ -123,6 +146,8 @@
                 results.forEach(function(result) {
                     if (result.error) {
                         $('#errorList').append('<div>' + result.sku + '</div>');
+                    } else {
+                        $('#successList').append('<div>' + result.sku + '</div>');
                     }
                 });
             });
@@ -135,7 +160,7 @@
             });
             var textoErrores = errores.join('\n');
             navigator.clipboard.writeText(textoErrores).then(function() {
-                alert('SKUs copiados al portapapeles.');
+                alert('SKUs sin foto copiados al portapapeles.');
             }, function(err) {
                 console.error('Error al copiar al portapapeles: ', err);
             });
