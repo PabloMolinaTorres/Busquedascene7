@@ -63,6 +63,15 @@
             background-color: #fff;
             position: relative;
         }
+        .result-column {
+            width: 45%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .result-column h3 {
+            text-align: center;
+            position: relative;
+        }
         .copy-button {
             position: absolute;
             top: 20px;
@@ -78,13 +87,8 @@
             letter-spacing: .075em;
             cursor: pointer;
         }
-        .result-column {
-            width: 45%;
-            display: inline-block;
-            vertical-align: top;
-        }
-        .result-column h3 {
-            text-align: center;
+        .copy-button.copied {
+            background-color: #28a745;
         }
         .error-list, .success-list {
             padding: 20px;
@@ -115,15 +119,18 @@
             </div>
         </div>
         <div class="rightContainer">
-            <button class="copy-button" id="copiar">COPIAR</button>
             <div class="result-column">
-                <h3>SKUs Sin Foto</h3>
+                <h3>SKUs Sin Foto
+                    <button class="copy-button" id="copiarSinFoto">COPIAR</button>
+                </h3>
                 <div class="error-list" id="errorList">
                     <!-- SKUs sin foto aparecerán aquí -->
                 </div>
             </div>
             <div class="result-column">
-                <h3>SKUs Con Foto</h3>
+                <h3>SKUs Con Foto
+                    <button class="copy-button" id="copiarConFoto">COPIAR</button>
+                </h3>
                 <div class="success-list" id="successList">
                     <!-- SKUs con foto aparecerán aquí -->
                 </div>
@@ -153,14 +160,33 @@
             });
         });
 
-        $('#copiar').click(function() {
+        $('#copiarSinFoto').click(function() {
             var errores = [];
             $('#errorList div').each(function() {
                 errores.push($(this).text());
             });
             var textoErrores = errores.join('\n');
             navigator.clipboard.writeText(textoErrores).then(function() {
-                alert('SKUs sin foto copiados al portapapeles.');
+                $('#copiarSinFoto').text('COPIADO').addClass('copied');
+                setTimeout(function() {
+                    $('#copiarSinFoto').text('COPIAR').removeClass('copied');
+                }, 2000);
+            }, function(err) {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        });
+
+        $('#copiarConFoto').click(function() {
+            var exitosos = [];
+            $('#successList div').each(function() {
+                exitosos.push($(this).text());
+            });
+            var textoExitosos = exitosos.join('\n');
+            navigator.clipboard.writeText(textoExitosos).then(function() {
+                $('#copiarConFoto').text('COPIADO').addClass('copied');
+                setTimeout(function() {
+                    $('#copiarConFoto').text('COPIAR').removeClass('copied');
+                }, 2000);
             }, function(err) {
                 console.error('Error al copiar al portapapeles: ', err);
             });
