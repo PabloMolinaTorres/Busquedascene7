@@ -107,6 +107,49 @@
         .success-list div {
             color: green;
         }
+        .switch-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #8fca00;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
     </style>
 </head>
 <body>
@@ -114,6 +157,12 @@
         <div class="leftMenu">
             <div class="intro">
                 <div>Verificar imágenes desde:</div><br>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="urlSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, uno debajo de otro sin comas"></textarea>
                 <button id="buscar">VERIFICAR</button>
             </div>
@@ -138,6 +187,13 @@
         </div>
     </div>
     <script>
+        let urlOption = 1;
+
+        $('#urlSwitch').change(function() {
+            urlOption = this.checked ? 2 : 1;
+            console.log("URL option switched to: " + urlOption);
+        });
+
         $('#buscar').click(function() {
             $('#errorList').empty();
             $('#successList').empty();
@@ -194,32 +250,16 @@
 
         function checkImage(sku) {
             return new Promise(function(resolve) {
-                var url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
+                let url;
+                if (urlOption === 1) {
+                    url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
+                } else {
+                    url = 'https://otrodominio.com/images/' + sku + '?scl=1&qlt=100,1&cache=off';
+                }
                 console.log("Verificando imagen para SKU: " + sku + " desde URL: " + url);
                 var img = new Image();
                 img.src = url;
                 img.alt = sku;
                 img.onload = function() {
                     fetch(url, { method: 'HEAD' }).then(function(response) {
-                        var contentLength = response.headers.get('content-length');
-                        console.log("Tamaño de contenido para SKU " + sku + ": " + contentLength);
-                        // Suponiendo que el tamaño de la imagen por defecto es 19698 bytes
-                        if (contentLength == '19698') {
-                            resolve({ error: true, sku: sku });
-                        } else {
-                            resolve({ error: false, sku: sku });
-                        }
-                    }).catch(function(error) {
-                        console.error("Error al obtener el tamaño de la imagen para SKU: " + sku, error);
-                        resolve({ error: true, sku: sku });
-                    });
-                };
-                img.onerror = function() {
-                    console.error("Error al cargar la imagen para SKU: " + sku);
-                    resolve({ error: true, sku: sku });
-                };
-            });
-        }
-    </script>
-</body>
-</html>
+                        var contentLength = response.headers.get('content
