@@ -2,337 +2,241 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Verificador de Fotos</title>
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+    <title>Renombrador Unificado</title>
     <style>
-        * {
-            box-sizing: border-box;
+        body {
             font-family: 'Lato', sans-serif;
-        }
-        html, body {
-            height: 100%;
+            background-color: #f4f4f4;
+            padding: 20px;
             margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #fff;
         }
         .container {
             display: flex;
-            height: 100%;
-            width: 100%;
+            justify-content: space-between;
+            align-items: flex-start;
         }
-        .leftMenu {
-            width: 320px;
-            height: 100vh;
-            border-right: 1px solid #eeeeee;
-            background-color: #fff;
-            overflow-y: auto;
-        }
-        .leftMenu .intro {
-            font-size: 12px;
-            padding: 20px 20px 0;
-        }
-        .leftMenu textarea {
-            width: calc(100% - 40px);
-            border: 1px solid #eee;
-            margin: 20px;
-            height: calc(100% - 150px);
-            font-family: monospace;
-        }
-        .leftMenu button {
-            width: calc(100% - 40px);
-            border: none;
-            margin: 0 20px 20px;
-            background-color: #8fca00;
-            height: 50px;
-            line-height: 50px;
-            padding: 0;
-            border-radius: 5px;
-            color: white;
-            font-size: 12px;
-            letter-spacing: .075em;
-            cursor: pointer;
-        }
-        .rightContainer {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background-color: #fff;
-            position: relative;
-        }
-        .result-column {
-            width: 45%;
-            display: inline-block;
-            vertical-align: top;
-        }
-        .result-column h3 {
-            text-align: center;
-            position: relative;
-        }
-        .copy-button, .download-button {
-            position: absolute;
+        .sidebar {
+            width: 20%;
+            margin-right: 20px;
+            position: sticky;
             top: 20px;
-            right: 20px;
-            border: none;
-            background-color: #007bff;
-            height: 40px;
-            line-height: 40px;
-            padding: 0 20px;
-            border-radius: 5px;
-            color: white;
+        }
+        .instructions {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
             font-size: 12px;
-            letter-spacing: .075em;
+            color: #333;
+            line-height: 1.4;
+        }
+        .instructions h2 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #4CAF50;
+        }
+        .file-list, .url-list {
+            width: 75%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 12px; 
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #8fca00;
+            color: white;
+        }
+        input[type="file"], textarea {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
-        .copy-button.copied, .download-button.downloaded {
-            background-color: #28a745;
-        }
-        .download-button {
-            right: 100px;
-        }
-        .error-list, .success-list {
-            padding: 20px;
-            margin: 20px;
-            border: 1px solid #eee;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            height: calc(100vh - 140px);
-            overflow-y: auto;
-        }
-        .error-list div {
-            color: red;
-        }
-        .success-list div {
-            color: green;
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         .switch-container {
-            text-align: center;
-            margin: 20px 0;
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 10px;
+            margin-bottom: 20px;
         }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
+        .switch-container button {
+            padding: 10px 20px;
+            border: none;
             background-color: #8fca00;
+            color: white;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .switch-container button.active {
+            background-color: #4CAF50;
         }
     </style>
 </head>
 <body>
+    <h1>Renombrador Unificado</h1>
+
+    <div class="switch-container">
+        <button id="localMode" class="active">Renombrar Archivos Locales</button>
+        <button id="urlMode">Renombrar Imágenes desde URLs</button>
+    </div>
+
     <div class="container">
-        <div class="leftMenu">
-            <div class="intro">
-                <div>Verificar imágenes desde:</div><br>
-                <div class="switch-container">
-                    <span>S7</span>
-                    <label class="switch">
-                        <input type="checkbox" id="urlSwitch">
-                        <span class="slider"></span>
-                    </label>
-                    <span>CF</span>
-                </div>
-                <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, usuario y caso separados por espacios"></textarea>
-                <button id="buscar">VERIFICAR</button>
-            </div>
+        <!-- Renombrar archivos locales -->
+        <div id="localForm" class="file-list active">
+            <h2>Renombrar Archivos Locales</h2>
+            <input type="file" id="fileUpload" multiple accept=".jpg,.jpeg,.png">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre de Archivo</th>
+                        <th>Nuevo Renombre</th>
+                    </tr>
+                </thead>
+                <tbody id="fileTable">
+                    <!-- Filas generadas dinámicamente -->
+                </tbody>
+            </table>
+            <button id="renameLocalButton" disabled>Renombrar y Descargar</button>
         </div>
-        <div class="rightContainer">
-            <div class="result-column">
-                <h3>SKUs Sin Foto
-                    <button class="copy-button" id="copiarSinFoto">COPIAR</button>
-                </h3>
-                <div class="error-list" id="errorList">
-                    <!-- SKUs sin foto aparecerán aquí -->
-                </div>
-            </div>
-            <div class="result-column">
-                <h3>SKUs Con Foto
-                    <button class="copy-button" id="copiarConFoto">COPIAR</button>
-                    <button class="download-button" id="descargarConFoto">DESCARGAR</button>
-                </h3>
-                <div class="success-list" id="successList">
-                    <!-- SKUs con foto aparecerán aquí -->
-                </div>
-            </div>
+
+        <!-- Renombrar imágenes desde URLs -->
+        <div id="urlForm" class="url-list" style="display: none;">
+            <h2>Renombrar Imágenes desde URLs</h2>
+            <textarea id="skuInputLeft" placeholder="Ingrese SKUs, uno por línea"></textarea>
+            <textarea id="skuInputRight" placeholder="Ingrese nuevos nombres, uno por línea"></textarea>
+            <button id="renameUrlButton">Renombrar y Descargar</button>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+
     <script>
-        let urlOption = 1;
+        const localModeButton = document.getElementById('localMode');
+        const urlModeButton = document.getElementById('urlMode');
+        const localForm = document.getElementById('localForm');
+        const urlForm = document.getElementById('urlForm');
+        const renameLocalButton = document.getElementById('renameLocalButton');
+        const fileTable = document.getElementById('fileTable');
+        const fileUpload = document.getElementById('fileUpload');
+        const renameUrlButton = document.getElementById('renameUrlButton');
 
-        $('#urlSwitch').change(function() {
-            urlOption = this.checked ? 2 : 1;
-            console.log("URL option switched to: " + urlOption);
+        let files = [];
+
+        // Cambiar entre modos
+        localModeButton.addEventListener('click', () => {
+            localForm.style.display = 'block';
+            urlForm.style.display = 'none';
+            localModeButton.classList.add('active');
+            urlModeButton.classList.remove('active');
         });
 
-        $('#buscar').click(function() {
-            $('#errorList').empty();
-            $('#successList').empty();
-            var skus = $('#skus').val().split('\n');
-            var promises = [];
-            skus.forEach(function(entry) {
-                entry = entry.trim();
-                if (entry !== "") {
-                    let parts = entry.split(/\s+/);
-                    let sku = parts[0];
-                    let user = parts[1] || "";
-                    let caseNum = parts[2] || "";
-                    promises.push(checkImage(sku, user, caseNum));
-                }
+        urlModeButton.addEventListener('click', () => {
+            localForm.style.display = 'none';
+            urlForm.style.display = 'block';
+            localModeButton.classList.remove('active');
+            urlModeButton.classList.add('active');
+        });
+
+        // Función para renombrar archivos locales
+        fileUpload.addEventListener('change', function() {
+            files = Array.from(this.files);
+            fileTable.innerHTML = '';
+            files.forEach((file, index) => {
+                const row = document.createElement('tr');
+                const originalNameCell = document.createElement('td');
+                const newNameCell = document.createElement('td');
+
+                originalNameCell.textContent = file.name;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Nuevo nombre para ' + file.name;
+
+                newNameCell.appendChild(input);
+                row.appendChild(originalNameCell);
+                row.appendChild(newNameCell);
+                fileTable.appendChild(row);
             });
-            Promise.all(promises).then(function(results) {
-                results.forEach(function(result) {
-                    if (result.error) {
-                        $('#errorList').append('<div>' + result.entry + '</div>');
-                    } else {
-                        $('#successList').append('<div>' + result.entry + '</div>');
-                    }
-                });
+
+            renameLocalButton.disabled = files.length === 0;
+        });
+
+        renameLocalButton.addEventListener('click', function() {
+            const zip = new JSZip();
+            const inputs = fileTable.querySelectorAll('input');
+
+            inputs.forEach((input, index) => {
+                const newName = input.value.trim() || files[index].name; // Usar el nombre original si no se ingresa uno nuevo
+                zip.file(newName, files[index]);
+            });
+
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                saveAs(content, 'renombrados_local.zip');
             });
         });
 
-        $('#copiarSinFoto').click(function() {
-            var errores = [];
-            $('#errorList div').each(function() {
-                errores.push($(this).text());
-            });
-            var textoErrores = errores.join('\n');
-            navigator.clipboard.writeText(textoErrores).then(function() {
-                $('#copiarSinFoto').text('COPIADO').addClass('copied');
-                setTimeout(function() {
-                    $('#copiarSinFoto').text('COPIAR').removeClass('copied');
-                }, 2000);
-            }, function(err) {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
-        });
+        // Función para renombrar imágenes desde URLs
+        renameUrlButton.addEventListener('click', function() {
+            const skus = document.getElementById('skuInputLeft').value.split('\n');
+            const renameSkus = document.getElementById('skuInputRight').value.split('\n');
+            const zip = new JSZip();
 
-        $('#copiarConFoto').click(function() {
-            var exitosos = [];
-            $('#successList div').each(function() {
-                exitosos.push($(this).text());
-            });
-            var textoExitosos = exitosos.join('\n');
-            navigator.clipboard.writeText(textoExitosos).then(function() {
-                $('#copiarConFoto').text('COPIADO').addClass('copied');
-                setTimeout(function() {
-                    $('#copiarConFoto').text('COPIAR').removeClass('copied');
-                }, 2000);
-            }, function(err) {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
-        });
+            if (skus.length !== renameSkus.length) {
+                alert('La cantidad de SKUs y nombres debe coincidir.');
+                return;
+            }
 
-        $('#descargarConFoto').click(function() {
-            var zip = new JSZip();
-            var count = 0;
-            $('#successList div').each(function() {
-                var entry = $(this).text();
-                let parts = entry.split(/\s+/);
-                let sku = parts[0];
-                let url = (urlOption === 1) ?
-                    'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off' :
-                    'https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/' + sku + '/w=1500,h=1500,fit=pad';
-                JSZipUtils.getBinaryContent(url, function(err, data) {
+            skus.forEach((sku, index) => {
+                const imgUrl = `https://example.com/images/${sku.trim()}.jpg`;
+                JSZipUtils.getBinaryContent(imgUrl, function(err, data) {
                     if (err) {
-                        console.error("Error al descargar la imagen para SKU: " + sku, err);
+                        console.error('Error al descargar imagen:', err);
                         return;
                     }
-                    zip.file(sku + ".jpg", data, { binary: true });
-                    count++;
-                    if (count === $('#successList div').length) {
-                        zip.generateAsync({ type: "blob" }).then(function(content) {
-                            saveAs(content, "imagenes.zip");
-                            $('#descargarConFoto').text('DESCARGADO').addClass('downloaded');
-                            setTimeout(function() {
-                                $('#descargarConFoto').text('DESCARGAR').removeClass('downloaded');
-                            }, 2000);
+                    zip.file(renameSkus[index].trim() + '.jpg', data, { binary: true });
+                    if (index === skus.length - 1) {
+                        zip.generateAsync({ type: 'blob' }).then(function(content) {
+                            saveAs(content, 'renombrados_url.zip');
                         });
                     }
                 });
             });
         });
-
-        function checkImage(sku, user, caseNum) {
-            return new Promise(function(resolve) {
-                let url;
-                if (urlOption === 1) {
-                    url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
-                } else {
-                    url = 'https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/' + sku + '/w=1500,h=1500,fit=pad';
-                }
-                console.log("Verificando imagen para SKU: " + sku + " desde URL: " + url);
-                var img = new Image();
-                img.src = url;
-                img.alt = sku;
-                img.onload = function() {
-                    if (urlOption === 1) {
-                        fetch(url, { method: 'HEAD' }).then(function(response) {
-                            var contentLength = response.headers.get('content-length');
-                            console.log("Tamaño de contenido para SKU " + sku + ": " + contentLength);
-                            // Suponiendo que el tamaño de la imagen por defecto es 19698 bytes
-                            if (contentLength == '19698') {
-                                resolve({ error: true, entry: sku + " " + user + " " + caseNum });
-                            } else {
-                                resolve({ error: false, entry: sku + " " + user + " " + caseNum });
-                            }
-                        }).catch(function(error) {
-                            console.error("Error al obtener el tamaño de la imagen para SKU: " + sku, error);
-                            resolve({ error: true, entry: sku + " " + user + " " + caseNum });
-                        });
-                    } else {
-                        resolve({ error: false, entry: sku + " " + user + " " + caseNum });
-                    }
-                };
-                img.onerror = function() {
-                    console.error("Error al cargar la imagen para SKU: " + sku);
-                    resolve({ error: true, entry: sku + " " + user + " " + caseNum });
-                };
-            });
-        }
     </script>
 </body>
 </html>
