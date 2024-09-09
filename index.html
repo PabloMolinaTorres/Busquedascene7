@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Renombrador de Imágenes</title>
+    <title>Visualiza</title>
     <link rel="icon" href="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" type="image/png">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
@@ -30,74 +30,77 @@
             height: 100%;
             width: 100%;
         }
-        .leftContainer, .rightContainer {
-            width: 50%;
-            padding: 20px;
+        .leftMenu, .rightMenu {
+            width: 320px;
+            min-width: 320px;
+            background-color: #fff;
             overflow-y: auto;
+            position: relative;
         }
-        .leftContainer {
+        .leftMenu {
             border-right: 1px solid #eeeeee;
         }
-        textarea {
-            width: calc(100% - 40px);
-            margin: 20px 0;
-            padding: 10px;
-            height: 150px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Lato', sans-serif;
-            font-size: 14px;
-            resize: none;
+        .rightMenu {
+            border-left: 1px solid #eeeeee;
         }
-        button {
+        .leftMenu .intro, .rightMenu .intro {
+            font-size: 12px;
+            padding: 20px 20px 0;
+        }
+        .leftMenu textarea, .rightMenu textarea {
+            width: calc(100% - 40px);
+            border: 1px solid #eee;
+            margin: 20px;
+            height: 150px;
+        }
+        .leftMenu button, .rightMenu button {
             width: calc(100% - 40px);
             border: none;
-            margin: 20px 0;
+            margin: 0 20px 20px;
             background-color: #8fca00;
             height: 50px;
             line-height: 50px;
+            padding: 0;
             border-radius: 5px;
             color: white;
             font-size: 12px;
+            letter-spacing: .075em;
             cursor: pointer;
-            text-transform: uppercase;
+        }
+        .rightMenu button[disabled] {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .rightContainer {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #fff;
         }
         .imgContainer {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-        .imgWrapper {
-            width: 120px;
-            height: 120px;
+        .imgContainer .imgWrapper {
+            width: 200px;
+            height: 200px;
             position: relative;
             display: block;
             overflow: hidden;
             border: 1px solid #eeeeee;
-            text-align: center;
         }
-        .imgWrapper img {
+        .imgContainer .imgWrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .sku {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            text-align: center;
-            font-size: 10px;
-            padding: 2px;
-        }
         .download-icon {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 20px;
-            height: 20px;
+            top: 0px;
+            right: 0px;
+            width: 24px;
+            height: 24px;
             opacity: 0.8;
             cursor: pointer;
             background-image: url('https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/descarga.png');
@@ -106,102 +109,114 @@
         .download-icon:hover {
             opacity: 1;
         }
-        .switch-container {
+        .setBar {
+            background-color: #fff;
+            padding: 20px;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .setBar button {
+            padding: 0;
+            background-color: #8fca00;
+            border: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            line-height: 30px;
+            height: 30px;
+            padding: 0 15px;
+            color: white;
+            font-weight: 700;
+            letter-spacing: .075em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 0;
+        }
+        .setBar button:hover {
+            background-color: #8fca00;
+            color: white;
+        }
+        .pais.seleccionado {
+            font-weight: 700;
+            text-decoration: underline;
+            color: #333;
+        }
+        .pais {
+            display: inline-block;
+            padding-right: 10px;
+            cursor: pointer;
+            color: #bbbbbb;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .icon-switch {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            margin: 20px;
         }
-        .switch-container span {
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
+        .icon-switch img {
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
+            margin-right: 10px;
         }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #8fca00;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .skuInput {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 10px;
+        .icon-switch img.inactive {
+            filter: grayscale(100%);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Contenedor izquierdo: entrada de SKUs -->
-        <div class="leftContainer">
-            <h3>Buscar Imágenes</h3>
-            <div class="switch-container">
-                <span>Vista</span>
-                <label class="switch">
-                    <input type="checkbox" id="viewToggle">
-                    <span class="slider"></span>
-                </label>
-                <span>SKU</span>
+        <div class="leftMenu">
+            <div class="icon-switch">
+                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" id="falabellaIcon" class="active">
+                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/sodimac-bn.png" id="sodimacIcon" class="inactive">
+                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/tottus-bn.png" id="tottusIcon" class="inactive">
             </div>
-            <div class="skuInput">
-                <textarea id="skuInputLeft" placeholder="Ingrese SKUs, uno por línea"></textarea>
-                <button id="buscar">Buscar</button>
+            <div class="intro paises" id="paisesContainer">
+                <div>Descargar imágenes desde:</div><br>
+                <div class="pais seleccionado" data-pais="CL">Chile</div>
+                <div class="pais" data-pais="CO">Colombia</div>
+                <div class="pais" data-pais="PE">Perú</div>
             </div>
-            <div id="leftCount"></div>
+            <div class="skus-container">
+                <textarea name="skus" id="skus" cols="30" rows="15" placeholder="Seleccione VISTA e ingrese SKU_VISTA, uno debajo del otro sin comas. Seleccione SKU e ingrese los SKUs uno debajo del otro sin comas"></textarea>
+                <button id="buscar">BUSCAR</button>
+            </div>
         </div>
-
-        <!-- Contenedor derecho: imágenes y renombrado -->
         <div class="rightContainer">
+            <div class="setBar">
+                <button id="descargartodo">DESCARGAR TODO</button>
+                <button id="ordenarVistas" disabled>ORDENAR VISTAS</button>
+            </div>
+            <div class="imgContainer"></div>
+        </div>
+        <!-- Nueva sección derecha para renombrado -->
+        <div class="rightMenu">
             <h3>Renombrar y Descargar</h3>
             <textarea id="skuInputRight" placeholder="Ingrese los nombres para renombrar, uno por línea"></textarea>
             <div id="rightCount"></div>
             <button id="downloadAll">Descargar Todo</button>
-            <div class="imgContainer" id="imgContainer">
-                <!-- Imágenes aparecerán aquí -->
-            </div>
         </div>
     </div>
 
     <script>
-        var skuList = [];
-        var mode = "vista"; // Por defecto, modo vista
+        var pais = "CL";  // Por defecto, Chile
+        var useFalabella = true;  // Estado inicial: usar Falabella
+        var useSodimac = false;
+        var useTottus = false;
+        var viewMode = "vista";  // Estado inicial: por vista
+        var skuList = [];  // Lista de SKUs
+        var country = "CL"; // País inicial
 
         // Función para cargar imagen
         function loadImage(sku, suffix = "") {
             return new Promise(function(resolve, reject) {
-                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/`;
+                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
                 var imgUrl = `${baseUrl}${sku}${suffix}/w=1500,h=1500,fit=pad`;
                 var img = new Image();
                 img.src = imgUrl;
@@ -215,30 +230,22 @@
                 };
 
                 img.onerror = function() {
-                    resolve(null); // Resolver promesa sin añadir miniatura "No disponible"
+                    resolve(null); 
                 };
             });
         }
-
-        // Cambiar entre vista y SKU
-        $('#viewToggle').change(function() {
-            mode = $(this).is(':checked') ? 'sku' : 'vista';
-            $('#imgContainer').empty();
-            skuList = [];
-            updateCounts();
-        });
 
         // Búsqueda de imágenes
         $('#buscar').click(function() {
             $('#imgContainer').empty();
             skuList = [];  // Resetear la lista
-            var skus = $('#skuInputLeft').val().trim().split('\n');
+            var skus = $('#skus').val().trim().split('\n');
 
             if (skus.length > 0) {
                 skus.forEach(function(sku) {
                     sku = sku.trim();
                     if (sku) {
-                        if (mode === "vista") {
+                        if (viewMode === "vista") {
                             skuList.push(sku);
                             loadImage(sku).then(function(imageElement) {
                                 if (imageElement) {
@@ -246,18 +253,6 @@
                                 } else {
                                     alert('Imagen no disponible para SKU: ' + sku);
                                 }
-                                updateCounts();
-                            });
-                        } else if (mode === "sku") {
-                            var suffixes = ['_01', '_02', '_03', '_1', '_10', '_11', '_2', '_3', '_4', '_5', '_6', '_7', '_8', '_9'];
-                            suffixes.forEach(function(suffix) {
-                                loadImage(sku, suffix).then(function(imageElement) {
-                                    if (imageElement) {
-                                        skuList.push(sku + suffix);
-                                        $('#imgContainer').append(imageElement);
-                                    }
-                                    updateCounts();
-                                });
                             });
                         }
                     }
@@ -267,10 +262,11 @@
             }
         });
 
+        // Renombrado y descarga
         $('#downloadAll').click(function() {
             var renameSkus = $('#skuInputRight').val().trim().split('\n');
-            var originalSkus = $('#skuInputLeft').val().trim().split('\n');
-            
+            var originalSkus = $('#skus').val().trim().split('\n');
+
             if (renameSkus.length !== originalSkus.length) {
                 alert('La cantidad de SKUs en el lado izquierdo y derecho debe coincidir.');
                 return;
@@ -314,6 +310,7 @@
             });
         });
 
+        // Formato de fecha para el nombre del archivo zip
         function getFormattedDate() {
             var date = new Date();
             var day = String(date.getDate()).padStart(2, '0');
@@ -322,13 +319,6 @@
             var minutes = String(date.getMinutes()).padStart(2, '0');
             return day + '-' + month + '_' + hours + minutes;
         }
-
-        function updateCounts() {
-            $('#leftCount').text('Total SKUs/Vistas: ' + skuList.length);
-            $('#rightCount').text('Total Renombres: ' + $('#skuInputRight').val().trim().split('\n').length);
-        }
-
-        $('#skuInputLeft, #skuInputRight').on('input', updateCounts);
     </script>
 </body>
 </html>
