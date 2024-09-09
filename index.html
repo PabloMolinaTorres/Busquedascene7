@@ -137,61 +137,81 @@
             background-color: #8fca00;
             color: white;
         }
-        .pais.seleccionado {
-            font-weight: 700;
-            text-decoration: underline;
-            color: #333;
-        }
-        .pais {
-            display: inline-block;
-            padding-right: 10px;
-            cursor: pointer;
-            color: #bbbbbb;
-        }
-        .error {
-            color: red;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-        .icon-switch {
+        .toggle-switch {
             display: flex;
             align-items: center;
-            margin: 20px;
+            justify-content: space-between;
+            margin-top: 20px;
         }
-        .icon-switch img {
-            width: 40px;
-            height: 40px;
+        .toggle-switch span {
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
             cursor: pointer;
-            margin-right: 10px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
         }
-        .icon-switch img.inactive {
-            filter: grayscale(100%);
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #8fca00;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="leftMenu">
-            <div class="icon-switch">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" id="falabellaIcon" class="active">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/sodimac-bn.png" id="sodimacIcon" class="inactive">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/tottus-bn.png" id="tottusIcon" class="inactive">
-            </div>
             <div class="intro paises" id="paisesContainer">
                 <div>Descargar imágenes desde:</div><br>
                 <div class="pais seleccionado" data-pais="CL">Chile</div>
                 <div class="pais" data-pais="CO">Colombia</div>
                 <div class="pais" data-pais="PE">Perú</div>
             </div>
-            <div class="skus-container">
-                <textarea name="skus" id="skus" cols="30" rows="15" placeholder="Seleccione VISTA e ingrese SKU_VISTA, uno debajo del otro sin comas. Seleccione SKU e ingrese los SKUs uno debajo del otro sin comas"></textarea>
-                <button id="buscar">BUSCAR</button>
+            <textarea name="skus" id="skus" cols="30" rows="15" placeholder="Seleccione VISTA e ingrese SKU_VISTA, uno debajo del otro sin comas. Seleccione SKU e ingrese los SKUs uno debajo del otro sin comas"></textarea>
+            <div class="toggle-switch">
+                <span>Vista</span>
+                <label class="switch">
+                    <input type="checkbox" id="viewToggle">
+                    <span class="slider"></span>
+                </label>
+                <span>SKU</span>
             </div>
+            <button id="buscar">Buscar</button>
         </div>
         <div class="rightContainer">
             <div class="setBar">
-                <button id="descargartodo">DESCARGAR TODO</button>
-                <button id="ordenarVistas" disabled>ORDENAR VISTAS</button>
+                <button id="descargartodo">Descargar Todo</button>
+                <button id="ordenarVistas" disabled>Ordenar Vistas</button>
             </div>
             <div class="imgContainer"></div>
         </div>
@@ -206,17 +226,13 @@
 
     <script>
         var pais = "CL";  // Por defecto, Chile
-        var useFalabella = true;  // Estado inicial: usar Falabella
-        var useSodimac = false;
-        var useTottus = false;
         var viewMode = "vista";  // Estado inicial: por vista
         var skuList = [];  // Lista de SKUs
-        var country = "CL"; // País inicial
 
         // Función para cargar imagen
         function loadImage(sku, suffix = "") {
             return new Promise(function(resolve, reject) {
-                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
+                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${pais}/`;
                 var imgUrl = `${baseUrl}${sku}${suffix}/w=1500,h=1500,fit=pad`;
                 var img = new Image();
                 img.src = imgUrl;
@@ -235,7 +251,7 @@
             });
         }
 
-        // Búsqueda de imágenes
+        // Búsqueda de imágenes por vista o SKU
         $('#buscar').click(function() {
             $('#imgContainer').empty();
             skuList = [];  // Resetear la lista
@@ -254,12 +270,29 @@
                                     alert('Imagen no disponible para SKU: ' + sku);
                                 }
                             });
+                        } else if (viewMode === "sku") {
+                            var suffixes = ['_01', '_02', '_03', '_1', '_10', '_11', '_2', '_3', '_4', '_5', '_6', '_7', '_8', '_9', '_90', '_91', '_92', '_93', '_94', '_95', '_96', '_97', '_98', '_99'];
+                            suffixes.forEach(function(suffix) {
+                                loadImage(sku, suffix).then(function(imageElement) {
+                                    if (imageElement) {
+                                        skuList.push(sku + suffix);
+                                        $('#imgContainer').append(imageElement);
+                                    }
+                                });
+                            });
                         }
                     }
                 });
             } else {
                 alert('Por favor, ingrese SKUs.');
             }
+        });
+
+        // Modo de búsqueda: vista o SKU
+        $('#viewToggle').change(function() {
+            viewMode = $(this).is(':checked') ? 'sku' : 'vista';
+            $('#imgContainer').empty();
+            skuList = [];
         });
 
         // Renombrado y descarga
@@ -279,7 +312,7 @@
             var filenames = [];
 
             skuList.forEach(function(sku) {
-                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/`;
+                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${pais}/`;
                 var imgUrl = `${baseUrl}${sku}/w=1500,h=1500,fit=pad`;
 
                 var originalSku = originalSkus.find(os => sku.startsWith(os));
