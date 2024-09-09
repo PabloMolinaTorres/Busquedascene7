@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta.charset="UTF-8">
     <meta charset="UTF-8">
-    <title>Renombrador de Imágenes Falabella</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" type="image/png">
+    <title>Verificador de Fotos</title>
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Last-Modified" content="0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js?v=1.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js?v=1.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js?v=1.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js?v=1.0"></script>
+@@ -10,6 +10,7 @@
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -30,247 +28,305 @@
             height: 100%;
             width: 100%;
         }
-        .leftContainer {
-            width: 30%;
-            padding: 20px;
+        .leftMenu {
+            width: 320px;
+            height: 100vh;
             border-right: 1px solid #eeeeee;
+            background-color: #fff;
+            overflow-y: auto;
         }
-        .rightContainer {
-            flex-grow: 1;
-            padding: 20px;
-        }
-        textarea {
-            width: 100%;
-            margin: 10px 0;
-            padding: 8px;
-            height: 120px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Lato', sans-serif;
+        .leftMenu .intro {
             font-size: 12px;
-            resize: none;
+            padding: 20px 20px 0;
         }
-        button {
-            width: 100%;
+        .leftMenu textarea {
+            width: calc(100% - 40px);
+            border: 1px solid #eee;
+            margin: 20px;
+            height: calc(100% - 150px);
+            font-family: monospace;
+        }
+        .leftMenu button {
+            width: calc(100% - 40px);
             border: none;
-            margin: 10px 0;
+            margin: 0 20px 20px;
             background-color: #8fca00;
-            height: 40px;
-            line-height: 40px;
+            height: 50px;
+            line-height: 50px;
+            padding: 0;
             border-radius: 5px;
             color: white;
             font-size: 12px;
+            letter-spacing: .075em;
             cursor: pointer;
-            text-transform: uppercase;
         }
-        .imgContainer {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .imgWrapper {
-            width: 120px;
-            height: 120px;
+        .rightContainer {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #fff;
             position: relative;
-            display: block;
-            overflow: hidden;
-            border: 1px solid #eeeeee;
+        }
+        .result-column {
+            width: 45%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .result-column h3 {
             text-align: center;
+            position: relative;
         }
-        .imgWrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .sku {
+        .copy-button, .download-button {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            text-align: center;
-            font-size: 10px;
-            padding: 2px;
-        }
-        .download-icon {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 20px;
-            height: 20px;
-            opacity: 0.8;
-            cursor: pointer;
-            background-image: url('https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/descarga.png');
-            background-size: cover;
-        }
-        .download-icon:hover {
-            opacity: 1;
-        }
-        .country-selector {
-            margin: 10px 0;
-        }
-        .country-link {
-            margin-right: 10px;
-            color: #8fca00;
-            text-decoration: none;
-            font-weight: bold;
+            top: 20px;
+            right: 20px;
+            border: none;
+            background-color: #007bff;
+            height: 40px;
+            line-height: 40px;
+            padding: 0 20px;
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            letter-spacing: .075em;
             cursor: pointer;
         }
-        .country-link:hover {
-            text-decoration: underline;
+        .copy-button.copied, .download-button.downloaded {
+            background-color: #28a745;
+        }
+        .download-button {
+            right: 100px;
+        }
+        .error-list, .success-list {
+            padding: 20px;
+            margin: 20px;
+            border: 1px solid #eee;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        .error-list div {
+            color: red;
+        }
+        .success-list div {
+            color: green;
         }
         .switch-container {
-            margin-bottom: 10px;
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #8fca00;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="link-visualizador">Visualizador</a> <!-- Enlace al Visualizador -->
     <div class="container">
-        <div class="leftContainer">
-            <h3>Buscar Imágenes</h3>
-            <div class="country-selector">
-                <a href="#" class="country-link" id="linkCL">Chile</a>
-                <a href="#" class="country-link" id="linkPE">Perú</a>
-                <a href="#" class="country-link" id="linkCO">Colombia</a>
+        <div class="leftMenu">
+            <div class="intro">
+                <div>Verificar imágenes desde:</div><br>
+                <div class="switch-container">
+                    <span>S7</span>
+                    <label class="switch">
+                        <input type="checkbox" id="urlSwitch">
+                        <span class="slider"></span>
+                    </label>
+                    <span>CF</span>
+                </div>
+                <textarea name="skus" id="skus" cols="30" rows="10" placeholder="Ingresá los SKUs, usuario y caso separados por espacios"></textarea>
+                <button id="buscar">VERIFICAR</button>
             </div>
-            <textarea id="skuInputLeft" placeholder="Ingrese SKUs, uno por línea"></textarea>
-            <div id="leftCount"></div>
-            <button id="buscar">Buscar</button>
-
-            <h3>Renombrar y Descargar</h3>
-            <textarea id="skuInputRight" placeholder="Ingrese los nombres para renombrar, uno por línea"></textarea>
-            <div id="rightCount"></div>
-            <button id="downloadAll">Descargar Todo</button>
         </div>
         <div class="rightContainer">
-            <div class="imgContainer" id="imgContainer">
-                <!-- Imágenes aparecerán aquí -->
+            <div class="result-column">
+                <h3>SKUs Sin Foto
+                    <button class="copy-button" id="copiarSinFoto">COPIAR</button>
+                </h3>
+                <div class="error-list" id="errorList">
+                    <!-- SKUs sin foto aparecerán aquí -->
+                </div>
+            </div>
+            <div class="result-column">
+                <h3>SKUs Con Foto
+                    <button class="copy-button" id="copiarConFoto">COPIAR</button>
+                    <button class="download-button" id="descargarConFoto">DESCARGAR</button>
+                </h3>
+                <div class="success-list" id="successList">
+                    <!-- SKUs con foto aparecerán aquí -->
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-        var skuList = [];
-        var mode = "vista"; // Por defecto, modo vista
-        var country = "CL"; // Por defecto, Chile
-
-        function loadImage(sku, suffix = "") {
-            return new Promise(function(resolve, reject) {
-                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
-                var imgUrl = `${baseUrl}${sku}${suffix}/w=1500,h=1500,fit=pad`;
-                var img = new Image();
-                img.src = imgUrl;
-                img.alt = sku + suffix;
-
-                img.onload = function() {
-                    var wrapper = $('<div class="imgWrapper"><a href="' + imgUrl + '" target="_blank"></a></div>');
-                    wrapper.find('a').append(img);
-                    wrapper.append('<div class="sku">' + sku + suffix + '</div>');
-                    resolve(wrapper);
-                };
-
-                img.onerror = function() {
-                    resolve(null);
-                };
-            });
-        }
-
-        $('.country-link').click(function() {
-            country = $(this).attr('id').replace('link', '');
-            $('#imgContainer').empty();
-            skuList = [];
-            updateCounts();
+        let urlOption = 1;
+        $('#urlSwitch').change(function() {
+            urlOption = this.checked ? 2 : 1;
+            console.log("URL option switched to: " + urlOption);
         });
-
         $('#buscar').click(function() {
-            $('#imgContainer').empty();
-            skuList = [];  // Resetear la lista
-            var skus = $('#skuInputLeft').val().trim().split('\n');
-
-            if (skus.length > 0) {
-                skus.forEach(function(sku) {
-                    sku = sku.trim();
-                    if (sku) {
-                        skuList.push(sku);
-                        loadImage(sku).then(function(imageElement) {
-                            if (imageElement) {
-                                $('#imgContainer').append(imageElement);
-                            } else {
-                                alert('Imagen no disponible para SKU: ' + sku);
-                            }
-                            updateCounts();
-                        });
-                    }
-                });
-            } else {
-                alert('Por favor, ingrese SKUs.');
-            }
-        });
-
-        $('#downloadAll').click(function() {
-            var renameSkus = $('#skuInputRight').val().trim().split('\n');
-            var originalSkus = $('#skuInputLeft').val().trim().split('\n');
-            
-            if (renameSkus.length !== originalSkus.length) {
-                alert('La cantidad de SKUs en el lado izquierdo y derecho debe coincidir.');
-                return;
-            }
-
-            var zip = new JSZip();
-            var count = 0;
-            var zipFilename = getFormattedDate() + ".zip";
-            var urls = [];
-            var filenames = [];
-
-            skuList.forEach(function(sku) {
-                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
-                var imgUrl = `${baseUrl}${sku}/w=1500,h=1500,fit=pad`;
-
-                var originalSku = originalSkus.find(os => sku.startsWith(os));
-                var renameSku = renameSkus[originalSkus.indexOf(originalSku)];
-
-                if (renameSku) {
-                    var finalName = sku.replace(originalSku, renameSku);
-                    urls.push(imgUrl);
-                    filenames.push(finalName);
+            $('#errorList').empty();
+            $('#successList').empty();
+            var skus = $('#skus').val().split('\n');
+            var promises = [];
+            skus.forEach(function(entry) {
+                entry = entry.trim();
+                if (entry !== "") {
+                    let parts = entry.split(/\s+/);
+                    let sku = parts[0];
+                    let user = parts[1] || "";
+                    let caseNum = parts[2] || "";
+                    promises.push(checkImage(sku, user, caseNum));
                 }
             });
-
-            urls.forEach(function(url, index) {
-                var filename = filenames[index] + ".jpg";
+            Promise.all(promises).then(function(results) {
+                results.forEach(function(result) {
+                    if (result.error) {
+                        $('#errorList').append('<div>' + result.entry + '</div>');
+                    } else {
+                        $('#successList').append('<div>' + result.entry + '</div>');
+                    }
+                });
+            });
+        });
+        $('#copiarSinFoto').click(function() {
+            var errores = [];
+            $('#errorList div').each(function() {
+                errores.push($(this).text());
+            });
+            var textoErrores = errores.join('\n');
+            navigator.clipboard.writeText(textoErrores).then(function() {
+                $('#copiarSinFoto').text('COPIADO').addClass('copied');
+                setTimeout(function() {
+                    $('#copiarSinFoto').text('COPIAR').removeClass('copied');
+                }, 2000);
+            }, function(err) {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        });
+        $('#copiarConFoto').click(function() {
+            var exitosos = [];
+            $('#successList div').each(function() {
+                exitosos.push($(this).text());
+            });
+            var textoExitosos = exitosos.join('\n');
+            navigator.clipboard.writeText(textoExitosos).then(function() {
+                $('#copiarConFoto').text('COPIADO').addClass('copied');
+                setTimeout(function() {
+                    $('#copiarConFoto').text('COPIAR').removeClass('copied');
+                }, 2000);
+            }, function(err) {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        });
+        $('#descargarConFoto').click(function() {
+            var zip = new JSZip();
+            var count = 0;
+            $('#successList div').each(function() {
+                var entry = $(this).text();
+                let parts = entry.split(/\s+/);
+                let sku = parts[0];
+                let url = (urlOption === 1) ?
+                    'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off' :
+                    'https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/' + sku + '/w=1500,h=1500,fit=pad';
                 JSZipUtils.getBinaryContent(url, function(err, data) {
                     if (err) {
-                        console.error("Error al obtener contenido binario:", err);
+                        console.error("Error al descargar la imagen para SKU: " + sku, err);
                         return;
                     }
-                    zip.file(filename, data, { binary: true });
+                    zip.file(sku + ".jpg", data, { binary: true });
                     count++;
-                    if (count === urls.length) {
-                        zip.generateAsync({ type: 'blob' }).then(function(content) {
-                            saveAs(content, zipFilename);
+                    if (count === $('#successList div').length) {
+                        zip.generateAsync({ type: "blob" }).then(function(content) {
+                            saveAs(content, "imagenes.zip");
+                            $('#descargarConFoto').text('DESCARGADO').addClass('downloaded');
+                            setTimeout(function() {
+                                $('#descargarConFoto').text('DESCARGAR').removeClass('downloaded');
+                            }, 2000);
                         });
                     }
                 });
             });
         });
-
-        function getFormattedDate() {
-            var date = new Date();
-            var day = String(date.getDate()).padStart(2, '0');
-            var month = String(date.getMonth() + 1).padStart(2, '0');
-            var hours = String(date.getHours()).padStart(2, '0');
-            var minutes = String(date.getMinutes()).padStart(2, '0');
-            return day + '-' + month + '_' + hours + minutes;
+        function checkImage(sku, user, caseNum) {
+            return new Promise(function(resolve) {
+                let url;
+                if (urlOption === 1) {
+                    url = 'https://s7d5.scene7.com/is/image/Falabella/' + sku + '?scl=1&qlt=100,1&cache=off';
+                } else {
+                    url = 'https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaCL/' + sku + '/w=1500,h=1500,fit=pad';
+                }
+                console.log("Verificando imagen para SKU: " + sku + " desde URL: " + url);
+                var img = new Image();
+                img.src = url;
+                img.alt = sku;
+                img.onload = function() {
+                    if (urlOption === 1) {
+                        fetch(url, { method: 'HEAD' }).then(function(response) {
+                            var contentLength = response.headers.get('content-length');
+                            console.log("Tamaño de contenido para SKU " + sku + ": " + contentLength);
+                            // Suponiendo que el tamaño de la imagen por defecto es 19698 bytes
+                            if (contentLength == '19698') {
+                                resolve({ error: true, entry: sku + " " + user + " " + caseNum });
+                            } else {
+                                resolve({ error: false, entry: sku + " " + user + " " + caseNum });
+                            }
+                        }).catch(function(error) {
+                            console.error("Error al obtener el tamaño de la imagen para SKU: " + sku, error);
+                            resolve({ error: true, entry: sku + " " + user + " " + caseNum });
+                        });
+                    } else {
+                        resolve({ error: false, entry: sku + " " + user + " " + caseNum });
+                    }
+                };
+                img.onerror = function() {
+                    console.error("Error al cargar la imagen para SKU: " + sku);
+                    resolve({ error: true, entry: sku + " " + user + " " + caseNum });
+                };
+            });
         }
-
-        function updateCounts() {
-            $('#leftCount').text('Total SKUs/Vistas: ' + skuList.length);
-            $('#rightCount').text('Total Renombres: ' + $('#skuInputRight').val().trim().split('\n').length);
-        }
-
-        $('#skuInputLeft, #skuInputRight').on('input', updateCounts);
     </script>
 </body>
 </html>
