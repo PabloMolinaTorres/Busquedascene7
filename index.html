@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Visualiza</title>
+    <title>Renombrador de Imágenes Falabella</title>
     <link rel="icon" href="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" type="image/png">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
@@ -30,59 +30,68 @@
             height: 100%;
             width: 100%;
         }
-        .leftMenu {
-            width: 320px;
+        .leftContainer {
+            width: 30%;
+            padding: 20px;
             border-right: 1px solid #eeeeee;
-            background-color: #fff;
-            overflow-y: auto;
         }
-        .leftMenu .intro {
+        .rightContainer {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            margin: 10px 0;
+            padding: 8px;
+            height: 120px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Lato', sans-serif;
             font-size: 12px;
-            padding: 20px 20px 0;
+            resize: none;
         }
-        .leftMenu textarea {
-            width: calc(100% - 40px);
-            border: 1px solid #eee;
-            margin: 20px;
-            height: 150px;
-        }
-        .leftMenu button {
-            width: calc(100% - 40px);
+        button {
+            width: 100%;
             border: none;
-            margin: 0 20px 20px;
+            margin: 10px 0;
             background-color: #8fca00;
-            height: 50px;
-            line-height: 50px;
+            height: 40px;
+            line-height: 40px;
             border-radius: 5px;
             color: white;
             font-size: 12px;
             cursor: pointer;
+            text-transform: uppercase;
         }
         .imgContainer {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            padding: 20px;
-            width: 100%;
-            background-color: #fff;
         }
         .imgWrapper {
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             position: relative;
             display: block;
             overflow: hidden;
             border: 1px solid #eeeeee;
+            text-align: center;
         }
         .imgWrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .rightContainer {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
+        .sku {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-align: center;
+            font-size: 10px;
+            padding: 2px;
         }
         .download-icon {
             position: absolute;
@@ -98,209 +107,170 @@
         .download-icon:hover {
             opacity: 1;
         }
-        .icon-switch {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px;
+        .country-selector {
+            margin: 10px 0;
         }
-        .icon-switch img {
-            width: 40px;
-            height: 40px;
+        .country-link {
+            margin-right: 10px;
+            color: #8fca00;
+            text-decoration: none;
+            font-weight: bold;
             cursor: pointer;
-            filter: grayscale(100%);
-            transition: filter 0.3s;
         }
-        .icon-switch img.active {
-            filter: grayscale(0%);
+        .country-link:hover {
+            text-decoration: underline;
         }
-        .setBar {
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        .setBar button {
-            background-color: #8fca00;
-            border: none;
-            font-size: 12px;
-            text-transform: uppercase;
-            padding: 10px 15px;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .toggle-switch {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .switch input {
-            display: none;
-        }
-        .slider {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: '';
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #8fca00;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .switch-container {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
+    <a href="index.html" class="link-visualizador">Visualizador</a> <!-- Enlace al Visualizador -->
     <div class="container">
-        <div class="leftMenu">
-            <div class="icon-switch">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/falabella.png" id="falabellaIcon" class="active">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/sodimac-bn.png" id="sodimacIcon">
-                <img src="https://raw.githubusercontent.com/PabloMolinaTorres/Visualiza2/main/tottus-bn.png" id="tottusIcon">
+        <div class="leftContainer">
+            <h3>Buscar Imágenes</h3>
+            <div class="country-selector">
+                <a href="#" class="country-link" id="linkCL">Chile</a>
+                <a href="#" class="country-link" id="linkPE">Perú</a>
+                <a href="#" class="country-link" id="linkCO">Colombia</a>
             </div>
-            <div class="intro">
-                Descargar imágenes desde:<br>
-                <div id="paisesContainer">
-                    <div class="pais seleccionado" data-pais="CL">Chile</div>
-                    <div class="pais" data-pais="CO">Colombia</div>
-                    <div class="pais" data-pais="PE">Perú</div>
-                </div>
-            </div>
-            <textarea id="skus" placeholder="Seleccione VISTA e ingrese SKU_VISTA..."></textarea>
-            <div class="toggle-switch">
-                <span>Vista</span>
-                <label class="switch">
-                    <input type="checkbox" id="viewToggle">
-                    <span class="slider"></span>
-                </label>
-                <span>SKU</span>
-            </div>
+            <textarea id="skuInputLeft" placeholder="Ingrese SKUs, uno por línea"></textarea>
+            <div id="leftCount"></div>
             <button id="buscar">Buscar</button>
+
+            <h3>Renombrar y Descargar</h3>
+            <textarea id="skuInputRight" placeholder="Ingrese los nombres para renombrar, uno por línea"></textarea>
+            <div id="rightCount"></div>
+            <button id="downloadAll">Descargar Todo</button>
         </div>
         <div class="rightContainer">
-            <div class="setBar">
-                <button id="descargartodo">Descargar Todo</button>
+            <div class="imgContainer" id="imgContainer">
+                <!-- Imágenes aparecerán aquí -->
             </div>
-            <div class="imgContainer" id="imgContainer"></div>
         </div>
     </div>
 
     <script>
-        var pais = "CL";
-        var useFalabella = true;
-        var viewMode = "vista"; 
+        var skuList = [];
+        var mode = "vista"; // Por defecto, modo vista
+        var country = "CL"; // Por defecto, Chile
 
-        // Función para actualizar países
-        function actualizarPaises() {
-            $('#paisesContainer div').click(function() {
-                $('#paisesContainer div').removeClass('seleccionado');
-                $(this).addClass('seleccionado');
-                pais = $(this).data('pais');
-                $('#imgContainer').empty();
+        function loadImage(sku, suffix = "") {
+            return new Promise(function(resolve, reject) {
+                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
+                var imgUrl = `${baseUrl}${sku}${suffix}/w=1500,h=1500,fit=pad`;
+                var img = new Image();
+                img.src = imgUrl;
+                img.alt = sku + suffix;
+
+                img.onload = function() {
+                    var wrapper = $('<div class="imgWrapper"><a href="' + imgUrl + '" target="_blank"></a></div>');
+                    wrapper.find('a').append(img);
+                    wrapper.append('<div class="sku">' + sku + suffix + '</div>');
+                    resolve(wrapper);
+                };
+
+                img.onerror = function() {
+                    resolve(null);
+                };
             });
         }
 
-        $('#viewToggle').change(function() {
-            viewMode = $(this).is(':checked') ? 'sku' : 'vista';
-        });
-
-        // Click en los iconos para cambiar de marca
-        $('#falabellaIcon').click(function() {
-            useFalabella = true;
-            $('#falabellaIcon').addClass('active');
-            $('#sodimacIcon').removeClass('active');
-            $('#tottusIcon').removeClass('active');
+        $('.country-link').click(function() {
+            country = $(this).attr('id').replace('link', '');
             $('#imgContainer').empty();
+            skuList = [];
+            updateCounts();
         });
-
-        $('#sodimacIcon').click(function() {
-            useFalabella = false;
-            $('#falabellaIcon').removeClass('active');
-            $('#sodimacIcon').addClass('active');
-            $('#tottusIcon').removeClass('active');
-            $('#imgContainer').empty();
-        });
-
-        $('#tottusIcon').click(function() {
-            useFalabella = false;
-            $('#falabellaIcon').removeClass('active');
-            $('#sodimacIcon').removeClass('active');
-            $('#tottusIcon').addClass('active');
-            $('#imgContainer').empty();
-        });
-
-        // Carga de imágenes
-        function loadImage(sku) {
-            var baseUrl = useFalabella ? 
-                `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${pais}/` :
-                `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/sodimac${pais}/`;
-
-            var imgUrl = `${baseUrl}${sku}/w=1500,h=1500,fit=pad`;
-            var img = new Image();
-            img.src = imgUrl;
-
-            img.onload = function() {
-                var wrapper = $('<div class="imgWrapper"></div>');
-                wrapper.append(img);
-                $('#imgContainer').append(wrapper);
-            };
-        }
 
         $('#buscar').click(function() {
-            var skus = $('#skus').val().split('\n');
             $('#imgContainer').empty();
-            skus.forEach(function(sku) {
-                sku = sku.trim();
-                if (sku) {
-                    loadImage(sku);
-                }
-            });
+            skuList = [];  // Resetear la lista
+            var skus = $('#skuInputLeft').val().trim().split('\n');
+
+            if (skus.length > 0) {
+                skus.forEach(function(sku) {
+                    sku = sku.trim();
+                    if (sku) {
+                        skuList.push(sku);
+                        loadImage(sku).then(function(imageElement) {
+                            if (imageElement) {
+                                $('#imgContainer').append(imageElement);
+                            } else {
+                                alert('Imagen no disponible para SKU: ' + sku);
+                            }
+                            updateCounts();
+                        });
+                    }
+                });
+            } else {
+                alert('Por favor, ingrese SKUs.');
+            }
         });
 
-        $('#descargartodo').click(function() {
-            var zip = new JSZip();
-            var urls = [];
+        $('#downloadAll').click(function() {
+            var renameSkus = $('#skuInputRight').val().trim().split('\n');
+            var originalSkus = $('#skuInputLeft').val().trim().split('\n');
+            
+            if (renameSkus.length !== originalSkus.length) {
+                alert('La cantidad de SKUs en el lado izquierdo y derecho debe coincidir.');
+                return;
+            }
 
-            $('.imgWrapper img').each(function() {
-                urls.push($(this).attr('src'));
+            var zip = new JSZip();
+            var count = 0;
+            var zipFilename = getFormattedDate() + ".zip";
+            var urls = [];
+            var filenames = [];
+
+            skuList.forEach(function(sku) {
+                var baseUrl = `https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabella${country}/`;
+                var imgUrl = `${baseUrl}${sku}/w=1500,h=1500,fit=pad`;
+
+                var originalSku = originalSkus.find(os => sku.startsWith(os));
+                var renameSku = renameSkus[originalSkus.indexOf(originalSku)];
+
+                if (renameSku) {
+                    var finalName = sku.replace(originalSku, renameSku);
+                    urls.push(imgUrl);
+                    filenames.push(finalName);
+                }
             });
 
             urls.forEach(function(url, index) {
+                var filename = filenames[index] + ".jpg";
                 JSZipUtils.getBinaryContent(url, function(err, data) {
-                    if (err) throw err;
-                    zip.file(`image_${index + 1}.jpg`, data, { binary: true });
-                    if (index === urls.length - 1) {
+                    if (err) {
+                        console.error("Error al obtener contenido binario:", err);
+                        return;
+                    }
+                    zip.file(filename, data, { binary: true });
+                    count++;
+                    if (count === urls.length) {
                         zip.generateAsync({ type: 'blob' }).then(function(content) {
-                            saveAs(content, 'images.zip');
+                            saveAs(content, zipFilename);
                         });
                     }
                 });
             });
         });
 
-        actualizarPaises();
+        function getFormattedDate() {
+            var date = new Date();
+            var day = String(date.getDate()).padStart(2, '0');
+            var month = String(date.getMonth() + 1).padStart(2, '0');
+            var hours = String(date.getHours()).padStart(2, '0');
+            var minutes = String(date.getMinutes()).padStart(2, '0');
+            return day + '-' + month + '_' + hours + minutes;
+        }
+
+        function updateCounts() {
+            $('#leftCount').text('Total SKUs/Vistas: ' + skuList.length);
+            $('#rightCount').text('Total Renombres: ' + $('#skuInputRight').val().trim().split('\n').length);
+        }
+
+        $('#skuInputLeft, #skuInputRight').on('input', updateCounts);
     </script>
 </body>
 </html>
